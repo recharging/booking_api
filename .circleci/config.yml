@@ -69,7 +69,7 @@ jobs:
           name: Heroku Container Push
           command: |
               heroku container:login
-              heroku stack:set container
+              heroku stack:set container -a recharging-bookingapi
               heroku container:push web -a recharging-bookingapi
               heroku container:release web -a recharging-bookingapi
 

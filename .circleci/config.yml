@@ -1,0 +1,99 @@
+version: 2.1
+
+orbs:
+  snyk: snyk/snyk@1.5.0
+  docker: circleci/docker@2.1.4
+  heroku: circleci/heroku@2.0.0
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/openjdk:19.0.1
+    steps:
+      - checkout
+      - run:
+          name: Build
+          command: mvn -B -DskipTests clean package
+      - run:
+          name: Test
+          command: mvn test
+  publish:
+    executor: docker/docker
+    steps:
+      - setup_remote_docker
+      - checkout
+      - docker/check
+      - docker/build:
+          image: recharging/booking-api
+          tag: 1.0.0
+      - docker/push:
+          image: recharging/booking-api
+          tag: 1.0.0
+
+  scan-vulnerabilities:
+    docker:
+      - image: cimg/openjdk:19.0.1
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/check
+      - run: docker build -t recharging/booking-api .
+      - snyk/scan:
+          docker-image-name: recharging/booking-api
+          severity-threshold: high
+          fail-on-issues: false
+
+  codescan:
+    docker:
+      - image: cimg/openjdk:19.0.1
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/check
+      - run: docker build -t recharging/booking-api .
+      - snyk/install
+      - run: |
+          snyk code test
+      # - snyk/scan:
+      #     docker-image-name: recharging/booking-api
+      #     severity-threshold: high
+      #     fail-on-issues: false
+
+  deploy:
+    docker:
+      - image: cimg/openjdk:19.0.1
+    steps:
+      - setup_remote_docker
+      - heroku/install
+      - checkout
+      - run:
+          name: Heroku Container Push
+          command: |
+              heroku container:login
+              heroku container:push web -a booking-api
+              heroku container:release web -a booking-api
+
+workflows:
+  build-and-test-scan-publish-deploy:
+    jobs:
+      - build-and-test
+      - scan-vulnerabilities:
+          requires:
+            - build-and-test
+      - codescan:
+          requires:
+            - build-and-test
+      - publish:
+          requires:
+            - build-and-test
+            - scan-vulnerabilities
+
+      - deploy:
+          requires:
+            - publish
+          filters:
+            branches:
+              only:
+                - release
+                - imageUrl
+                - account
+                - cloudimage

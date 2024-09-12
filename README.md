@@ -1,0 +1,15 @@
+- The API will allow users to book seats based on the availability
+- Users can create an account for booking purposes
+- Users can view different events, as well as details of each event
+- Users can choose a time and a seat of an event based on the availability
+- Users can view their bookings and modify as needed
+
+- Identify the endpoints
+  - GET /users
+  - GET /events
+  - GET /events/:id
+  - POST /users
+  - DELETE /events
+- Store the necessary information in the database
+- Store the log files in separate files
+- Implement validation as needed

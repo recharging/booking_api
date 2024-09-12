@@ -38,3 +38,4 @@ logs/warn.log
 logs/info.log
 logs/error.log
 logs/bookingservice.log
+.env

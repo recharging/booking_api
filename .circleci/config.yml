@@ -90,10 +90,10 @@ workflows:
       - deploy:
           requires:
             - publish
-          filters:
-            branches:
-              only:
-                - release
-                - imageUrl
-                - account
-                - cloudimage
+          # filters:
+          #   branches:
+          #     only:
+          #       - release
+          #       - imageUrl
+          #       - account
+          #       - cloudimage

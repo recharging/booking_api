@@ -73,7 +73,7 @@ jobs:
               heroku container:release web -a recharging-bookingapi
 
 workflows:
-  build-and-test-scan-publish-deploy:
+  build-test-scan-publish-deploy:
     jobs:
       - build-and-test
       - scan-vulnerabilities:
